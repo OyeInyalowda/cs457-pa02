@@ -1,0 +1,12 @@
+# Video files (never commit or submit these)
+bunny.*
+
+# Build outputs
+dispatcher
+amal/amal
+basim/basim
+
+# Generated keys and logs
+*.pem
+amal/logAmal.txt
+basim/logBasim.txt
