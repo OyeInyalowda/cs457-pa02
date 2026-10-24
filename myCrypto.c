@@ -3,11 +3,11 @@ My Cryptographic Library
 
 FILE:   myCrypto.c
 
-Written By:  Team #   MUST WRITE YOUR TEAM NUMBER HERE
+Written By:  Team #3
      1- Mike Vance
-     2- MUST WRITE YOUR FULL NAME
+     2- Jack Delano
 
-Submitted on:
+Submitted on: 24OCT26
 ----------------------------------------------------------------------------*/
 
 #include "myCrypto.h"
@@ -280,12 +280,11 @@ EVP_PKEY *getRSAfromFile(char *filename, int public)
         return NULL;
     }
 
-    // Passing NULL lets OpenSSL allocate the key, so nothing leaks if the read fails
-    EVP_PKEY *key;
+    EVP_PKEY *key = EVP_PKEY_new();
     if (public)
-        key = PEM_read_PUBKEY(fp, NULL, NULL, NULL);
+        key = PEM_read_PUBKEY(fp, &key, NULL, NULL);
     else
-        key = PEM_read_PrivateKey(fp, NULL, NULL, NULL);
+        key = PEM_read_PrivateKey(fp, &key, NULL, NULL);
 
     fclose(fp);
 
