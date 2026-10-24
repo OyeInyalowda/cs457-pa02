@@ -334,20 +334,52 @@ int privKeySign(uint8_t **sig, size_t *sigLen, EVP_PKEY *privKey,
 int pubKeyVerify(uint8_t *sig, size_t sigLen, EVP_PKEY *pubKey,
                  uint8_t *data, size_t dataLen)
 {
-    // TODO (Basim side): implement
-    //
-    // Guard against incoming NULL pointers
-    //
-    // Create and Initialize a context for RSA public-key signature verification
-    // EVP_PKEY_CTX_new( );
-    // EVP_PKEY_verify_init( )
-    // EVP_PKEY_CTX_set_rsa_padding( use RSA_PKCS1_PADDING )
-    //
-    // Verify the signature vs the incoming data using EVP_PKEY_verify( )
-    //
-    // Free any dynamically-allocated objects
+    int status;
 
-    return 0;
+    // Guard against incoming NULL pointers
+    if (!sig || !pubKey || !data)
+    {
+        printf("\n******* pkeySign received some NULL pointers\n");
+        return 0;
+    }
+    // Create and Initialize a context for RSA public-key signature verification
+    EVP_PKEY_CTX *ctx;
+    ctx = EVP_PKEY_CTX_new(pubKey, NULL);
+    if (!ctx)
+    {
+        fprintf(stderr, "pubKeyVerify: failed to create context\n");
+        return 0;
+    }
+
+    status = EVP_PKEY_verify_init(ctx);
+    if (status != 1)
+    {
+        EVP_PKEY_CTX_free(ctx);
+        fprintf(stderr, "pubKeyVerify: unable to initialize context for verification\n");
+        return 0;
+    }
+
+    status = EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING);
+    if (status != 1)
+    {
+        EVP_PKEY_CTX_free(ctx);
+        fprintf(stderr, "pubKeyVerify: failed to set CTX padding\n");
+        return 0;
+    }
+
+    // Verify the signature vs the incoming data using this context
+    int decision = EVP_PKEY_verify(ctx, sig, sigLen, data, dataLen);
+
+    // free any dynamically-allocated objects
+    EVP_PKEY_CTX_free(ctx);
+
+    // return 1 for match and 0 otherwise
+    if (decision != 1)
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 //-----------------------------------------------------------------------------
